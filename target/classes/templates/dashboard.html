@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - PeerTutorMatchmaker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .role-card { background: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn { display: inline-block; padding: 15px 30px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px; }
+        .btn:hover { background-color: #0056b3; }
+        .btn-success { background-color: #28a745; }
+        .btn-success:hover { background-color: #218838; }
+        .icon { font-size: 3em; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to PeerTutorMatchmaker</h1>
+            <p id="welcomeMessage">Choose your dashboard based on your role</p>
+            <a href="/notifications" class="btn">View Notifications</a>
+            <a href="/login" class="btn">Logout</a>
+        </div>
+
+        <div class="role-cards">
+            <div class="role-card">
+                <div class="icon">🎓</div>
+                <h3>Student Dashboard</h3>
+                <p>Find tutors, book sessions, and manage your learning journey</p>
+                <a href="/student-dashboard" class="btn">Go to Student Dashboard</a>
+            </div>
+
+            <div class="role-card">
+                <div class="icon">👨‍🏫</div>
+                <h3>Tutor Dashboard</h3>
+                <p>Manage sessions, view feedback, and help students learn</p>
+                <a href="/tutor-dashboard" class="btn btn-success">Go to Tutor Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (user.name) {
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${user.name}!`;
+            
+            // Auto-redirect based on role
+            if (user.role === 'STUDENT') {
+                setTimeout(() => {
+                    window.location.href = '/student-dashboard';
+                }, 2000);
+            } else if (user.role === 'TUTOR') {
+                setTimeout(() => {
+                    window.location.href = '/tutor-dashboard';
+                }, 2000);
+            }
+        } else {
+            // Redirect to login if no user data
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>

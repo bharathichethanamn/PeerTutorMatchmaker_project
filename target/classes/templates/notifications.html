@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - PeerTutorMatchmaker</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="/" class="logo">🎓 PeerTutorMatchmaker</a>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="goToDashboard()">Dashboard</a></li>
+                    <li><a href="/notifications">Notifications</a></li>
+                    <li><a href="#" onclick="app.logout()">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">Notifications</h1>
+            <p style="opacity: 0.9;">Stay updated with your latest activities</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Notification Controls -->
+        <div class="card mb-6">
+            <div class="card-body">
+                <div style="display: flex; justify-content: between; align-items: center; gap: 1rem;">
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-primary btn-sm" onclick="markAllAsRead()">Mark All as Read</button>
+                        <button class="btn btn-secondary btn-sm" onclick="filterNotifications('unread')">Show Unread</button>
+                        <button class="btn btn-secondary btn-sm" onclick="filterNotifications('all')">Show All</button>
+                    </div>
+                    <div>
+                        <span id="unreadCount" class="badge badge-primary">0 unread</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600;">Recent Notifications</h3>
+            </div>
+            <div class="card-body">
+                <div id="notificationsContainer">
+                    <!-- Notifications will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        let currentFilter = 'all';
+        let allNotifications = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.userId) {
+                window.location.href = '/login';
+                return;
+            }
+
+            loadNotifications();
+        });
+
+        async function loadNotifications() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const response = await fetch(`/api/notifications/user/${currentUser.userId}`);
+                allNotifications = await response.json();
+                
+                displayNotifications();
+                updateUnreadCount();
+            } catch (error) {
+                console.error('Failed to load notifications:', error);
+                document.getElementById('notificationsContainer').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <p>Failed to load notifications</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayNotifications() {
+            const container = document.getElementById('notificationsContainer');
+            
+            let filteredNotifications = allNotifications;
+            if (currentFilter === 'unread') {
+                filteredNotifications = allNotifications.filter(n => !n.isRead);
+            }
+            
+            if (filteredNotifications.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+                        <p>No notifications ${currentFilter === 'unread' ? 'unread' : 'found'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredNotifications.map(notification => `
+                <div class="notification-item ${!notification.isRead ? 'unread' : ''}" 
+                     style="border-bottom: 1px solid var(--gray-200); padding: 1rem 0; cursor: pointer;"
+                     onclick="markAsRead(${notification.notificationId})">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <div style="font-size: 1.5rem;">${getNotificationIcon(notification.message)}</div>
+                                <span style="font-weight: ${!notification.isRead ? '600' : '400'}; color: ${!notification.isRead ? 'var(--gray-800)' : 'var(--gray-600)'};">
+                                    ${notification.message}
+                                </span>
+                                ${!notification.isRead ? '<div style="width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%; margin-left: 0.5rem;"></div>' : ''}
+                            </div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">
+                                ${formatTimestamp(notification.timestamp)}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            ${!notification.isRead ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); markAsRead(${notification.notificationId})">Mark Read</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getNotificationIcon(message) {
+            if (message.includes('session request') || message.includes('Session request')) return '📅';
+            if (message.includes('confirmed') || message.includes('accepted')) return '✅';
+            if (message.includes('cancelled') || message.includes('declined')) return '❌';
+            if (message.includes('completed')) return '🎉';
+            if (message.includes('feedback')) return '⭐';
+            return '🔔';
+        }
+
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffInHours = (now - date) / (1000 * 60 * 60);
+            
+            if (diffInHours < 1) {
+                const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+                return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+            } else if (diffInHours < 24) {
+                const hours = Math.floor(diffInHours);
+                return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+            } else if (diffInHours < 168) { // 7 days
+                const days = Math.floor(diffInHours / 24);
+                return `${days} day${days !== 1 ? 's' : ''} ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        function updateUnreadCount() {
+            const unreadCount = allNotifications.filter(n => !n.isRead).length;
+            document.getElementById('unreadCount').textContent = `${unreadCount} unread`;
+        }
+
+        async function markAsRead(notificationId) {
+            try {
+                const response = await fetch(`/api/notifications/${notificationId}/read`, {
+                    method: 'PUT'
+                });
+                
+                if (response.ok) {
+                    // Update local data
+                    const notification = allNotifications.find(n => n.notificationId === notificationId);
+                    if (notification) {
+                        notification.isRead = true;
+                    }
+                    
+                    displayNotifications();
+                    updateUnreadCount();
+                } else {
+                    app.showNotification('Failed to mark notification as read', 'error');
+                }
+            } catch (error) {
+                app.showNotification('Network error. Please try again.', 'error');
+            }
+        }
+
+        async function markAllAsRead() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const unreadNotifications = allNotifications.filter(n => !n.isRead);
+                
+                for (const notification of unreadNotifications) {
+                    await fetch(`/api/notifications/${notification.notificationId}/read`, {
+                        method: 'PUT'
+                    });
+                    notification.isRead = true;
+                }
+                
+                displayNotifications();
+                updateUnreadCount();
+                app.showNotification('All notifications marked as read', 'success');
+            } catch (error) {
+                app.showNotification('Failed to mark all as read', 'error');
+            }
+        }
+
+        function filterNotifications(filter) {
+            currentFilter = filter;
+            displayNotifications();
+            
+            // Update button states
+            document.querySelectorAll('.btn-secondary').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            });
+            
+            if (filter === 'unread') {
+                event.target.classList.remove('btn-secondary');
+                event.target.classList.add('btn-primary');
+            } else if (filter === 'all') {
+                event.target.classList.remove('btn-secondary');
+                event.target.classList.add('btn-primary');
+            }
+        }
+
+        function goToDashboard() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (currentUser.role === 'TUTOR') {
+                window.location.href = '/tutor-dashboard';
+            } else {
+                window.location.href = '/student-dashboard';
+            }
+        }
+    </script>
+
+    <style>
+        .notification-item.unread {
+            background-color: var(--gray-50);
+        }
+        
+        .notification-item:hover {
+            background-color: var(--gray-100);
+        }
+    </style>
+</body>
+</html>

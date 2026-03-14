@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - PeerTutorMatchmaker</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="/" class="logo">🎓 PeerTutorMatchmaker</a>
+                <ul class="nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/login">Login</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Register Form -->
+    <div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
+        <div class="card" style="width: 100%; max-width: 500px;">
+            <div class="card-header text-center">
+                <h2 style="font-size: 1.5rem; font-weight: 600; color: var(--gray-800);">Create Account</h2>
+                <p style="color: var(--gray-600); margin-top: 0.5rem;">Join our learning community</p>
+            </div>
+            
+            <div class="card-body">
+                <form id="registerForm">
+                    <div class="grid grid-cols-2">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-input" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2">
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" name="password" class="form-input" placeholder="Create a password" required minlength="6">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="role" class="form-label">I want to be a</label>
+                            <select id="role" name="role" class="form-input" required onchange="toggleProfileFields()">
+                                <option value="">Select role</option>
+                                <option value="STUDENT">Student (Looking for help)</option>
+                                <option value="TUTOR">Tutor (Offering help)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Fields (shown based on role) -->
+                    <div id="profileFields" class="hidden">
+                        <div class="form-group">
+                            <label for="subjects" class="form-label">Subjects of Interest</label>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Mathematics"> Mathematics</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Physics"> Physics</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Chemistry"> Chemistry</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Biology"> Biology</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Computer Science"> Computer Science</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Programming"> Programming</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="English Literature"> English Literature</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Writing"> Writing</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="History"> History</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Geography"> Geography</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Economics"> Economics</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Business Studies"> Business Studies</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Statistics"> Statistics</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Spanish"> Spanish</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="French"> French</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Art"> Art</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Design"> Design</label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal;"><input type="checkbox" name="subjectCheck" value="Psychology"> Psychology</label>
+                            </div>
+                            <input type="hidden" id="subjects" name="subjects">
+                            <input type="text" id="customSubjects" class="form-input" placeholder="Add other subjects (comma-separated)" style="margin-top: 0.5rem;">
+                            <small style="color: var(--gray-500); font-size: 0.75rem;">Select from above or add custom subjects</small>
+                        </div>
+                        
+                        <div class="grid grid-cols-2">
+                            <div class="form-group">
+                                <label for="skillLevel" class="form-label">Skill Level</label>
+                                <select id="skillLevel" name="skillLevel" class="form-input">
+                                    <option value="">Select level</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                    <option value="Expert">Expert</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="availability" class="form-label">Availability</label>
+                                <input type="text" id="availability" name="availability" class="form-input" placeholder="e.g., Weekends, Evenings">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-full">Create Account</button>
+                </form>
+            </div>
+            
+            <div class="card-footer text-center">
+                <p style="color: var(--gray-600); font-size: 0.875rem;">
+                    Already have an account? 
+                    <a href="/login" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Sign in here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        function toggleProfileFields() {
+            const role = document.getElementById('role').value;
+            const profileFields = document.getElementById('profileFields');
+            
+            if (role) {
+                profileFields.classList.remove('hidden');
+            } else {
+                profileFields.classList.add('hidden');
+            }
+        }
+
+        // Handle subject selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[name="subjectCheck"]');
+            const subjectsInput = document.getElementById('subjects');
+            const customSubjectsInput = document.getElementById('customSubjects');
+
+            function updateSubjects() {
+                const selectedSubjects = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+                
+                const customSubjects = customSubjectsInput.value
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(s => s.length > 0);
+                
+                const allSubjects = [...selectedSubjects, ...customSubjects];
+                subjectsInput.value = allSubjects.join(', ');
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateSubjects));
+            customSubjectsInput.addEventListener('input', updateSubjects);
+        });
+    </script>
+</body>
+</html>

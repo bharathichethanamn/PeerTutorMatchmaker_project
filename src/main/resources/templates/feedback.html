@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - PeerTutorMatchmaker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        textarea { height: 100px; resize: vertical; }
+        .btn { padding: 12px 24px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background-color: #218838; }
+        .rating-input { display: flex; gap: 10px; align-items: center; }
+        .star { font-size: 24px; color: #ddd; cursor: pointer; }
+        .star.active { color: #ffc107; }
+        .session-card { border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 10px; cursor: pointer; }
+        .session-card:hover { background-color: #f8f9fa; }
+        .session-card.selected { background-color: #e3f2fd; border-color: #2196f3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Submit Feedback</h1>
+            <p>Rate your tutoring experience</p>
+        </div>
+
+        <div class="card">
+            <h3>Select Completed Session</h3>
+            <div id="completedSessions"></div>
+        </div>
+
+        <div class="card">
+            <h3>Feedback Form</h3>
+            <form id="feedbackForm">
+                <input type="hidden" id="selectedSessionId">
+                <input type="hidden" id="selectedTutorId">
+                
+                <div class="form-group">
+                    <label>Session Details:</label>
+                    <div id="sessionDetails">Please select a session above</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Rating (1-5 stars):</label>
+                    <div class="rating-input">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                        <span id="ratingText">No rating selected</span>
+                    </div>
+                    <input type="hidden" id="rating" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="comments">Comments (optional):</label>
+                    <textarea id="comments" placeholder="Share your experience with this tutor..."></textarea>
+                </div>
+
+                <button type="submit" class="btn">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        let selectedRating = 0;
+
+        async function loadCompletedSessions() {
+            try {
+                const response = await fetch(`/api/sessions/student/${user.userId}`);
+                const sessions = await response.json();
+                const completedSessions = sessions.filter(s => s.status === 'COMPLETED');
+                displayCompletedSessions(completedSessions);
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+            }
+        }
+
+        function displayCompletedSessions(sessions) {
+            const container = document.getElementById('completedSessions');
+            container.innerHTML = sessions.map(session => `
+                <div class="session-card" onclick="selectSession(${session.sessionId}, ${session.tutor.userId}, '${session.subject}', '${session.tutor.name}', '${session.dateTime}')">
+                    <h4>${session.subject}</h4>
+                    <p>Tutor: ${session.tutor.name}</p>
+                    <p>Date: ${new Date(session.dateTime).toLocaleString()}</p>
+                </div>
+            `).join('') || '<p>No completed sessions available for feedback</p>';
+        }
+
+        function selectSession(sessionId, tutorId, subject, tutorName, dateTime) {
+            // Remove previous selection
+            document.querySelectorAll('.session-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            event.target.closest('.session-card').classList.add('selected');
+            
+            // Update form
+            document.getElementById('selectedSessionId').value = sessionId;
+            document.getElementById('selectedTutorId').value = tutorId;
+            document.getElementById('sessionDetails').innerHTML = `
+                <strong>Subject:</strong> ${subject}<br>
+                <strong>Tutor:</strong> ${tutorName}<br>
+                <strong>Date:</strong> ${new Date(dateTime).toLocaleString()}
+            `;
+        }
+
+        // Rating system
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                document.getElementById('rating').value = selectedRating;
+                updateStarDisplay();
+                updateRatingText();
+            });
+
+            star.addEventListener('mouseover', function() {
+                const hoverRating = parseInt(this.dataset.rating);
+                highlightStars(hoverRating);
+            });
+        });
+
+        document.querySelector('.rating-input').addEventListener('mouseleave', function() {
+            updateStarDisplay();
+        });
+
+        function highlightStars(rating) {
+            document.querySelectorAll('.star').forEach((star, index) => {
+                star.classList.toggle('active', index < rating);
+            });
+        }
+
+        function updateStarDisplay() {
+            highlightStars(selectedRating);
+        }
+
+        function updateRatingText() {
+            const texts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            document.getElementById('ratingText').textContent = texts[selectedRating] || 'No rating selected';
+        }
+
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const sessionId = document.getElementById('selectedSessionId').value;
+            const tutorId = document.getElementById('selectedTutorId').value;
+            const rating = document.getElementById('rating').value;
+            const comments = document.getElementById('comments').value;
+
+            if (!sessionId) {
+                alert('Please select a session');
+                return;
+            }
+
+            if (!rating) {
+                alert('Please provide a rating');
+                return;
+            }
+
+            const feedbackData = {
+                sessionId: parseInt(sessionId),
+                studentId: user.userId,
+                tutorId: parseInt(tutorId),
+                rating: parseInt(rating),
+                comments: comments
+            };
+
+            try {
+                const response = await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(feedbackData)
+                });
+
+                if (response.ok) {
+                    alert('Feedback submitted successfully!');
+                    window.location.href = '/student-dashboard';
+                } else {
+                    alert('Failed to submit feedback');
+                }
+            } catch (error) {
+                alert('Error submitting feedback');
+            }
+        });
+
+        // Load initial data
+        loadCompletedSessions();
+    </script>
+</body>
+</html>

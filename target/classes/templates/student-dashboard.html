@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - PeerTutorMatchmaker</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="/" class="logo">🎓 PeerTutorMatchmaker</a>
+                <ul class="nav-links">
+                    <li><a href="/student-dashboard">Dashboard</a></li>
+                    <li><a href="/notifications">Notifications</a></li>
+                    <li><a href="#" onclick="app.logout()">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container">
+            <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">Student Dashboard</h1>
+            <p style="opacity: 0.9;">Welcome back! Find tutors and manage your learning sessions</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalSessions">0</div>
+                <div class="stat-label">Total Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedSessions">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingSessions">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgRating">0</div>
+                <div class="stat-label">Avg Tutor Rating</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-2">
+            <!-- Find Tutors Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="font-size: 1.25rem; font-weight: 600;">Find Tutors</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <input type="text" id="searchTutors" class="form-input" placeholder="Search by subject (e.g., Math, Physics)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <select id="subjectFilter" class="form-input" onchange="filterTutorsBySubject()">
+                            <option value="">All Subjects</option>
+                            <optgroup label="STEM">
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Physics">Physics</option>
+                                <option value="Chemistry">Chemistry</option>
+                                <option value="Biology">Biology</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Programming">Programming</option>
+                            </optgroup>
+                            <optgroup label="Languages">
+                                <option value="English Literature">English Literature</option>
+                                <option value="Writing">Writing</option>
+                                <option value="Spanish">Spanish</option>
+                                <option value="French">French</option>
+                            </optgroup>
+                            <optgroup label="Social Sciences">
+                                <option value="History">History</option>
+                                <option value="Geography">Geography</option>
+                                <option value="Psychology">Psychology</option>
+                            </optgroup>
+                            <optgroup label="Business">
+                                <option value="Economics">Economics</option>
+                                <option value="Business Studies">Business Studies</option>
+                                <option value="Statistics">Statistics</option>
+                            </optgroup>
+                            <optgroup label="Arts">
+                                <option value="Art">Art</option>
+                                <option value="Design">Design</option>
+                                <option value="Photography">Photography</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div id="tutorsContainer" class="grid grid-cols-1" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Tutors will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Sessions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="font-size: 1.25rem; font-weight: 600;">My Sessions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Tutor</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessionsContainer">
+                                <!-- Sessions will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card mt-6">
+            <div class="card-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600;">Recent Activity</h3>
+            </div>
+            <div class="card-body">
+                <div id="recentActivity">
+                    <div style="text-align: center; color: var(--gray-500); padding: 2rem;">
+                        <p>No recent activity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Session Modal -->
+    <div id="sessionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Book a Session</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sessionForm">
+                    <input type="hidden" id="sessionTutorId" name="tutorId">
+                    
+                    <div class="form-group">
+                        <label for="sessionSubject" class="form-label">Subject</label>
+                        <input type="text" id="sessionSubject" name="subject" class="form-input" placeholder="Enter subject" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sessionDateTime" class="form-label">Preferred Date & Time</label>
+                        <input type="datetime-local" id="sessionDateTime" name="dateTime" class="form-input" required>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="app.closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Book Session</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Rate Your Session</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="feedbackForm">
+                    <input type="hidden" id="feedbackSessionId" name="sessionId">
+                    <input type="hidden" id="feedbackTutorId" name="tutorId">
+                    
+                    <div class="form-group">
+                        <label for="rating" class="form-label">Rating (1-5 stars)</label>
+                        <select id="rating" name="rating" class="form-input" required>
+                            <option value="">Select rating</option>
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2 - Fair</option>
+                            <option value="3">3 - Good</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="5">5 - Excellent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="comments" class="form-label">Comments (Optional)</label>
+                        <textarea id="comments" name="comments" class="form-input" rows="4" placeholder="Share your experience..."></textarea>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="app.closeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!currentUser.userId || currentUser.role !== 'STUDENT') {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Load initial data
+            app.loadTutors();
+            app.loadSessions();
+            loadDashboardStats();
+        });
+
+        async function loadDashboardStats() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const response = await fetch(`/api/sessions/student/${currentUser.userId}`);
+                const sessions = await response.json();
+                
+                const totalSessions = sessions.length;
+                const completedSessions = sessions.filter(s => s.status === 'COMPLETED').length;
+                const pendingSessions = sessions.filter(s => s.status === 'PENDING').length;
+                
+                document.getElementById('totalSessions').textContent = totalSessions;
+                document.getElementById('completedSessions').textContent = completedSessions;
+                document.getElementById('pendingSessions').textContent = pendingSessions;
+                
+                // Calculate average rating (would need feedback data)
+                document.getElementById('avgRating').textContent = '4.2';
+            } catch (error) {
+                console.error('Failed to load dashboard stats:', error);
+            }
+        }
+
+        function filterTutorsBySubject() {
+            const selectedSubject = document.getElementById('subjectFilter').value;
+            app.loadTutors(selectedSubject);
+        }
+    </script>
+</body>
+</html>
