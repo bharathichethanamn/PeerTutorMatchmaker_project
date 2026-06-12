@@ -25,8 +25,8 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div class="container">
-            <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">Student Dashboard</h1>
-            <p style="opacity: 0.9;">Welcome back! Find tutors and manage your learning sessions</p>
+            <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">Welcome, <span id="studentName"></span>!</h1>
+            <p style="opacity: 0.9;">Find tutors and manage your learning sessions</p>
         </div>
     </div>
 
@@ -56,15 +56,23 @@
             <!-- Find Tutors Section -->
             <div class="card">
                 <div class="card-header">
-                    <h3 style="font-size: 1.25rem; font-weight: 600;">Find Tutors</h3>
+                    <h3 style="font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                        🔍 Find Tutors
+                    </h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <input type="text" id="searchTutors" class="form-input" placeholder="Search by subject (e.g., Math, Physics)">
+                    <!-- Enhanced Search -->
+                    <div class="search-container">
+                        <input type="text" 
+                               id="searchTutors" 
+                               class="search-input" 
+                               placeholder="Search tutors by name or subject...">
+                        <span class="search-icon">🔍</span>
                     </div>
                     
-                    <div class="form-group">
-                        <select id="subjectFilter" class="form-input" onchange="filterTutorsBySubject()">
+                    <!-- Filters -->
+                    <div class="filter-container">
+                        <select id="subjectFilter" class="filter-select" onchange="filterTutorsBySubject()">
                             <option value="">All Subjects</option>
                             <optgroup label="STEM">
                                 <option value="Mathematics">Mathematics</option>
@@ -96,9 +104,29 @@
                                 <option value="Photography">Photography</option>
                             </optgroup>
                         </select>
+                        
+                        <select id="skillFilter" class="filter-select" onchange="filterTutorsBySkill()">
+                            <option value="">Any Skill Level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                        
+                        <select id="ratingFilter" class="filter-select" onchange="filterTutorsByRating()">
+                            <option value="">Any Rating</option>
+                            <option value="4">4+ Stars</option>
+                            <option value="3">3+ Stars</option>
+                            <option value="2">2+ Stars</option>
+                        </select>
+                        
+                        <button class="clear-filters" onclick="clearAllFilters()">
+                            ✕ Clear
+                        </button>
                     </div>
                     
-                    <div id="tutorsContainer" class="grid grid-cols-1" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Tutors Container -->
+                    <div id="tutorsContainer" class="grid grid-cols-1" style="max-height: 500px; overflow-y: auto; gap: 1rem;">
                         <!-- Tutors will be loaded here -->
                     </div>
                 </div>
@@ -149,7 +177,7 @@
     <div id="sessionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Book a Session</h3>
+                <h3 class="modal-title">📅 Book a Tutoring Session</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
@@ -158,17 +186,19 @@
                     
                     <div class="form-group">
                         <label for="sessionSubject" class="form-label">Subject</label>
-                        <input type="text" id="sessionSubject" name="subject" class="form-input" placeholder="Enter subject" required>
+                        <input type="text" id="sessionSubject" name="subject" class="form-input" placeholder="What do you need help with?" required>
+                        <div class="form-hint">Be specific about the topic or area you need assistance with</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="sessionDateTime" class="form-label">Preferred Date & Time</label>
                         <input type="datetime-local" id="sessionDateTime" name="dateTime" class="form-input" required>
+                        <div class="form-hint">Choose a time that works for both you and your tutor</div>
                     </div>
                     
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" onclick="app.closeModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Book Session</button>
+                        <button type="submit" class="btn btn-primary">🚀 Send Request</button>
                     </div>
                 </form>
             </div>
@@ -179,7 +209,7 @@
     <div id="feedbackModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Rate Your Session</h3>
+                <h3 class="modal-title">⭐ Rate Your Tutoring Session</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
@@ -188,25 +218,26 @@
                     <input type="hidden" id="feedbackTutorId" name="tutorId">
                     
                     <div class="form-group">
-                        <label for="rating" class="form-label">Rating (1-5 stars)</label>
+                        <label for="rating" class="form-label">How was your session?</label>
                         <select id="rating" name="rating" class="form-input" required>
-                            <option value="">Select rating</option>
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2 - Fair</option>
-                            <option value="3">3 - Good</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="5">5 - Excellent</option>
+                            <option value="">Select your rating</option>
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent - Exceeded expectations</option>
+                            <option value="4">⭐⭐⭐⭐ Very Good - Met expectations</option>
+                            <option value="3">⭐⭐⭐ Good - Satisfactory</option>
+                            <option value="2">⭐⭐ Fair - Below expectations</option>
+                            <option value="1">⭐ Poor - Needs improvement</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="comments" class="form-label">Comments (Optional)</label>
-                        <textarea id="comments" name="comments" class="form-input" rows="4" placeholder="Share your experience..."></textarea>
+                        <label for="comments" class="form-label">Share your experience (Optional)</label>
+                        <textarea id="comments" name="comments" class="form-input" rows="4" placeholder="What did you like? Any suggestions for improvement?"></textarea>
+                        <div class="form-hint">Your feedback helps other students and improves the tutoring experience</div>
                     </div>
                     
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="app.closeModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        <button type="button" class="btn btn-secondary" onclick="app.closeModal()">Skip</button>
+                        <button type="submit" class="btn btn-primary">✅ Submit Feedback</button>
                     </div>
                 </form>
             </div>
@@ -224,6 +255,9 @@
                 return;
             }
 
+            // Display user name
+            document.getElementById('studentName').textContent = currentUser.name || 'Student';
+
             // Load initial data
             app.loadTutors();
             app.loadSessions();
@@ -233,6 +267,8 @@
         async function loadDashboardStats() {
             try {
                 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                
+                // Load user's sessions
                 const response = await fetch(`/api/sessions/student/${currentUser.userId}`);
                 const sessions = await response.json();
                 
@@ -244,16 +280,45 @@
                 document.getElementById('completedSessions').textContent = completedSessions;
                 document.getElementById('pendingSessions').textContent = pendingSessions;
                 
-                // Calculate average rating (would need feedback data)
+                // Calculate average rating from feedback (would need additional API call)
                 document.getElementById('avgRating').textContent = '4.2';
+                
+                // Also load platform stats for context
+                const statsResponse = await fetch('/api/stats');
+                const platformStats = await statsResponse.json();
+                
+                // Update the page title with real tutor count
+                const dashboardTitle = document.querySelector('.dashboard-header h1');
+                if (dashboardTitle && platformStats.activeTutors > 0) {
+                    dashboardTitle.innerHTML = `Welcome, <span id="studentName">${currentUser.name || 'Student'}</span>! <small style="opacity: 0.7; font-size: 0.8rem;">(${platformStats.activeTutors} tutors available)</small>`;
+                }
             } catch (error) {
                 console.error('Failed to load dashboard stats:', error);
+                // Keep default values on error
             }
         }
 
         function filterTutorsBySubject() {
             const selectedSubject = document.getElementById('subjectFilter').value;
             app.loadTutors(selectedSubject);
+        }
+        
+        function filterTutorsBySkill() {
+            // This would be implemented when backend supports skill filtering
+            console.log('Skill filter:', document.getElementById('skillFilter').value);
+        }
+        
+        function filterTutorsByRating() {
+            // This would be implemented when backend supports rating filtering
+            console.log('Rating filter:', document.getElementById('ratingFilter').value);
+        }
+        
+        function clearAllFilters() {
+            document.getElementById('subjectFilter').value = '';
+            document.getElementById('skillFilter').value = '';
+            document.getElementById('ratingFilter').value = '';
+            document.getElementById('searchTutors').value = '';
+            app.loadTutors();
         }
     </script>
 </body>

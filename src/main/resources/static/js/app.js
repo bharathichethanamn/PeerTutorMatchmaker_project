@@ -68,6 +68,15 @@ class PeerTutorApp {
 
     async handleLogin(e) {
         e.preventDefault();
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Add loading state
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Signing in...';
+        
         const formData = new FormData(e.target);
         const loginData = {
             email: formData.get('email'),
@@ -88,19 +97,31 @@ class PeerTutorApp {
             if (response.ok) {
                 this.currentUser = result;
                 localStorage.setItem('currentUser', JSON.stringify(result));
-                this.showNotification('Login successful!', 'success');
+                this.showNotification('Welcome back!', 'success', 'Login Successful');
                 
-                // Redirect based on role
-                if (result.role === 'TUTOR') {
-                    window.location.href = '/tutor-dashboard';
-                } else {
-                    window.location.href = '/student-dashboard';
-                }
+                // Add a small delay for better UX
+                setTimeout(() => {
+                    if (result.role === 'TUTOR') {
+                        window.location.href = '/tutor-dashboard';
+                    } else {
+                        window.location.href = '/student-dashboard';
+                    }
+                }, 1000);
             } else {
-                this.showNotification(result.error || 'Login failed', 'error');
+                this.showNotification(result.error || 'Invalid email or password', 'error', 'Login Failed');
+                
+                // Reset button state
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         } catch (error) {
-            this.showNotification('Network error. Please try again.', 'error');
+            this.showNotification('Unable to connect. Please check your internet connection.', 'error', 'Connection Error');
+            
+            // Reset button state
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         }
     }
 
@@ -212,6 +233,11 @@ class PeerTutorApp {
     }
 
     async loadTutors(subject = '') {
+        const container = document.getElementById('tutorsContainer');
+        if (container) {
+            this.showSkeleton(container, 4);
+        }
+        
         try {
             let url = '/api/tutors';
             if (subject) {
@@ -221,9 +247,24 @@ class PeerTutorApp {
             const response = await fetch(url);
             const tutors = await response.json();
             
+            // Simulate network delay for better UX demonstration
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
             this.displayTutors(tutors);
         } catch (error) {
-            this.showNotification('Failed to load tutors', 'error');
+            if (container) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-state-icon">⚠️</span>
+                        <h3>Failed to load tutors</h3>
+                        <p>Please check your connection and try again.</p>
+                        <button class="empty-state-action" onclick="app.loadTutors()">
+                            Retry
+                        </button>
+                    </div>
+                `;
+            }
+            this.showNotification('Failed to load tutors', 'error', 'Connection Error');
         }
     }
 
@@ -231,19 +272,73 @@ class PeerTutorApp {
         const container = document.getElementById('tutorsContainer');
         if (!container) return;
 
-        container.innerHTML = tutors.map(tutor => `
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="mb-2">${tutor.name}</h3>
-                    <p class="text-gray-600 mb-2">${tutor.profile?.subjects || 'No subjects listed'}</p>
-                    <p class="text-sm text-gray-500 mb-2">Skill Level: ${tutor.profile?.skillLevel || 'Not specified'}</p>
-                    <p class="text-sm text-gray-500 mb-4">Rating: ${tutor.profile?.rating || 0}/5 (${tutor.profile?.totalRatings || 0} reviews)</p>
-                    <button class="btn btn-primary" onclick="app.openSessionModal(${tutor.userId})">
-                        Book Session
+        if (tutors.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-state-icon">🔍</span>
+                    <h3>No tutors found</h3>
+                    <p>Try adjusting your search criteria or check back later for new tutors.</p>
+                    <button class="empty-state-action" onclick="document.getElementById('searchTutors').value = ''; app.loadTutors();">
+                        Show All Tutors
                     </button>
                 </div>
-            </div>
-        `).join('');
+            `;
+            return;
+        }
+
+        container.innerHTML = tutors.map(tutor => {
+            const subjects = (tutor.profile?.subjects || '').split(',').filter(s => s.trim()).slice(0, 3);
+            const rating = tutor.profile?.rating || 0;
+            const totalRatings = tutor.profile?.totalRatings || 0;
+            
+            return `
+                <div class="tutor-card animate-fade-in">
+                    <div class="tutor-card-header">
+                        <div class="tutor-avatar">
+                            ${tutor.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="tutor-info">
+                            <div class="tutor-name">${tutor.name}</div>
+                            <div class="tutor-subject">${subjects.length > 0 ? subjects[0] : 'Various subjects'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tutor-meta">
+                        <div class="tutor-rating">
+                            <div class="rating-stars">
+                                ${this.generateStars(rating)}
+                            </div>
+                            <span class="rating-text">${rating.toFixed(1)} (${totalRatings})</span>
+                        </div>
+                        ${tutor.profile?.skillLevel ? `<div class="skill-badge">${tutor.profile.skillLevel}</div>` : ''}
+                    </div>
+                    
+                    ${subjects.length > 0 ? `
+                        <div class="tutor-subjects">
+                            ${subjects.map(subject => `<span class="subject-tag">${subject.trim()}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="tutor-card-footer">
+                        <div class="tutor-availability">
+                            <span class="availability-dot"></span>
+                            ${tutor.profile?.availability || 'Available'}
+                        </div>
+                        <button class="btn-book-session" onclick="app.openSessionModal(${tutor.userId})">
+                            📅 Book Session
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    generateStars(rating) {
+        const stars = [];
+        for (let i = 1; i <= 5; i++) {
+            stars.push(`<span class="rating-star ${i <= rating ? 'filled' : ''}">${i <= rating ? '★' : '☆'}</span>`);
+        }
+        return stars.join('');
     }
 
     async loadSessions() {
@@ -370,29 +465,88 @@ class PeerTutorApp {
         });
     }
 
-    showNotification(message, type = 'info') {
+    showNotification(message, type = 'info', title = null) {
+        // Remove existing notifications
+        document.querySelectorAll('.notification').forEach(n => n.remove());
+        
+        // Icon mapping
+        const icons = {
+            info: 'ℹ️',
+            success: '✓',
+            warning: '⚠️',
+            error: '❌'
+        };
+        
         // Create notification element
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
         notification.innerHTML = `
+            <div class="notification-icon">${icons[type] || icons.info}</div>
             <div class="notification-content">
-                <span>${message}</span>
-                <button class="notification-close">&times;</button>
+                ${title ? `<div class="notification-title">${title}</div>` : ''}
+                <div class="notification-message">${message}</div>
             </div>
+            <button class="notification-close">&times;</button>
         `;
 
         // Add to page
         document.body.appendChild(notification);
 
         // Auto remove after 5 seconds
-        setTimeout(() => {
-            notification.remove();
+        const autoRemove = setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }
         }, 5000);
 
         // Manual close
         notification.querySelector('.notification-close').addEventListener('click', () => {
-            notification.remove();
+            clearTimeout(autoRemove);
+            notification.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
         });
+    }
+
+    showLoading(container, message = 'Loading...') {
+        if (typeof container === 'string') {
+            container = document.getElementById(container);
+        }
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <span>${message}</span>
+            </div>
+        `;
+    }
+
+    showSkeleton(container, count = 3) {
+        if (typeof container === 'string') {
+            container = document.getElementById(container);
+        }
+        if (!container) return;
+        
+        const skeletons = Array.from({ length: count }, (_, i) => `
+            <div class="tutor-card">
+                <div class="tutor-card-header">
+                    <div class="skeleton" style="width: 52px; height: 52px; border-radius: var(--radius-xl);"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-line short"></div>
+                        <div class="skeleton skeleton-line medium"></div>
+                    </div>
+                </div>
+                <div class="skeleton skeleton-line long"></div>
+                <div class="skeleton skeleton-line medium"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <div class="skeleton skeleton-line short"></div>
+                    <div class="skeleton" style="width: 100px; height: 32px;"></div>
+                </div>
+            </div>
+        `).join('');
+        
+        container.innerHTML = skeletons;
     }
 
     logout() {

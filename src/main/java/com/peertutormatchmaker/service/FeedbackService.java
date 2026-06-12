@@ -74,4 +74,16 @@ public class FeedbackService {
     public List<Feedback> getFeedbackByStudent(Long studentId) {
         return feedbackRepository.findByStudent_UserId(studentId);
     }
+
+    public double getAverageRating() {
+        List<Feedback> allFeedbacks = feedbackRepository.findAll();
+        if (allFeedbacks.isEmpty()) {
+            return 4.2; // Default rating
+        }
+        
+        return allFeedbacks.stream()
+            .mapToInt(Feedback::getRating)
+            .average()
+            .orElse(4.2);
+    }
 }

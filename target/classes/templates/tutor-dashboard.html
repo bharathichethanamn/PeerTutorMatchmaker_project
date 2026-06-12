@@ -25,7 +25,7 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div class="container">
-            <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">Tutor Dashboard</h1>
+            <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: 0.5rem;">Welcome, <span id="tutorName"></span>!</h1>
             <p style="opacity: 0.9;">Manage your tutoring sessions and help students succeed</p>
         </div>
     </div>
@@ -190,6 +190,9 @@
                 window.location.href = '/login';
                 return;
             }
+
+            // Display user name
+            document.getElementById('tutorName').textContent = currentUser.name || 'Tutor';
 
             // Load initial data
             app.loadSessions();

@@ -100,4 +100,11 @@ public class SessionService {
     public Optional<Session> findById(Long sessionId) {
         return sessionRepository.findById(sessionId);
     }
+
+    public long getCompletedSessionsCount() {
+        List<Session> allSessions = sessionRepository.findAll();
+        return allSessions.stream()
+            .filter(session -> session.getStatus() == Session.Status.COMPLETED)
+            .count();
+    }
 }

@@ -5,134 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PeerTutorMatchmaker - Connect, Learn, Grow</title>
     <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <div class="navbar-content">
                 <a href="/" class="logo">🎓 PeerTutorMatchmaker</a>
                 <ul class="nav-links">
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/register">Register</a></li>
+                    <li><a href="/login">Sign In</a></li>
+                    <li><a href="/register" class="btn-nav">Get Started</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 4rem 0; text-align: center;">
-        <div class="container">
-            <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1rem;">Connect, Learn, Grow</h1>
-            <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">Find the perfect peer tutor or share your knowledge with others</p>
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <a href="/register" class="btn btn-primary" style="background: white; color: var(--primary-color); font-size: 1rem; padding: 1rem 2rem;">Get Started</a>
-                <a href="/login" class="btn btn-secondary" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white;">Sign In</a>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-badge animate-bounce">✨ Free peer-to-peer learning platform</div>
+            <h1>Learn Better with<br><span>Peer Tutoring</span></h1>
+            <p>Connect with expert peers who can help you master any subject — or share your knowledge and help others succeed.</p>
+            <div class="hero-actions">
+                <a href="/register" class="btn btn-hero-primary animate-glow">🚀 Start Learning Free</a>
+                <a href="/login" class="btn btn-hero-secondary">Sign In →</a>
+            </div>
+            <div class="hero-stats">
+                <div>
+                    <span class="hero-stat-number">0+</span>
+                    <div class="hero-stat-label">Active Tutors</div>
+                </div>
+                <div>
+                    <span class="hero-stat-number">0+</span>
+                    <div class="hero-stat-label">Students Helped</div>
+                </div>
+                <div>
+                    <span class="hero-stat-number">0+</span>
+                    <div class="hero-stat-label">Subjects</div>
+                </div>
+                <div>
+                    <span class="hero-stat-number">0★</span>
+                    <div class="hero-stat-label">Avg Rating</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section style="padding: 4rem 0;">
+    <!-- Features -->
+    <section class="section" style="background: white;">
         <div class="container">
-            <div class="text-center mb-8">
-                <h2 style="font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem;">Why Choose PeerTutorMatchmaker?</h2>
-                <p style="font-size: 1.125rem; color: var(--gray-600);">Everything you need for successful peer-to-peer learning</p>
+            <div class="section-header">
+                <div class="eyebrow">Why PeerTutorMatchmaker?</div>
+                <h2>Everything you need to learn smarter</h2>
+                <p>A complete platform built for students and tutors to connect, schedule, and grow together.</p>
             </div>
-            
             <div class="grid grid-cols-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Smart Matching</h3>
-                        <p style="color: var(--gray-600);">Find tutors by subject, skill level, rating, and availability with our intelligent search system</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Matching</h3>
+                    <p>Find tutors by subject, skill level, and rating with our intelligent search and filter system.</p>
                 </div>
-                
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Easy Scheduling</h3>
-                        <p style="color: var(--gray-600);">Book and manage tutoring sessions with real-time notifications and confirmations</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Easy Scheduling</h3>
+                    <p>Book sessions, get confirmations, and manage your tutoring calendar all in one place.</p>
                 </div>
-                
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Quality Assurance</h3>
-                        <p style="color: var(--gray-600);">Rate and review tutors to maintain high-quality learning experiences for everyone</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Ratings & Reviews</h3>
+                    <p>Rate tutors after every session to maintain quality and help others choose the right match.</p>
                 </div>
-                
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Real-time Updates</h3>
-                        <p style="color: var(--gray-600);">Stay informed with instant notifications about session requests and updates</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Real-time Notifications</h3>
+                    <p>Get instant alerts for session requests, confirmations, and updates directly on your dashboard.</p>
                 </div>
-                
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Progress Tracking</h3>
-                        <p style="color: var(--gray-600);">Monitor your learning journey with comprehensive dashboards and analytics</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Progress Dashboard</h3>
+                    <p>Track your sessions, completions, and performance through a clean analytics view.</p>
                 </div>
-                
-                <div class="card text-center">
-                    <div class="card-body">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
-                        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Personalized Experience</h3>
-                        <p style="color: var(--gray-600);">Customized recommendations based on your learning goals and preferences</p>
-                    </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Role-Based Access</h3>
+                    <p>Separate dashboards for students and tutors ensure a tailored experience for everyone.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section style="background: var(--gray-100); padding: 4rem 0;">
+    <!-- How it works -->
+    <section class="section" style="background: var(--gray-50);">
         <div class="container">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Active Tutors</div>
+            <div class="section-header">
+                <div class="eyebrow">How It Works</div>
+                <h2>Get started in minutes</h2>
+            </div>
+            <div class="grid grid-cols-3" style="max-width: 800px; margin: 0 auto;">
+                <div style="text-align: center; padding: 1.5rem;">
+                    <div style="width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; margin: 0 auto 1rem;">1</div>
+                    <h3 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--gray-900);">Create Account</h3>
+                    <p style="font-size: 0.875rem; color: var(--gray-500);">Register as a student or tutor in under a minute.</p>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">1,200+</div>
-                    <div class="stat-label">Students Helped</div>
+                <div style="text-align: center; padding: 1.5rem;">
+                    <div style="width: 56px; height: 56px; background: var(--secondary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; margin: 0 auto 1rem;">2</div>
+                    <h3 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--gray-900);">Find & Connect</h3>
+                    <p style="font-size: 0.875rem; color: var(--gray-500);">Browse tutors by subject and book a session.</p>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">50+</div>
-                    <div class="stat-label">Subjects Available</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">4.8/5</div>
-                    <div class="stat-label">Average Rating</div>
+                <div style="text-align: center; padding: 1.5rem;">
+                    <div style="width: 56px; height: 56px; background: var(--success); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; margin: 0 auto 1rem;">3</div>
+                    <h3 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--gray-900);">Learn & Grow</h3>
+                    <p style="font-size: 0.875rem; color: var(--gray-500);">Attend sessions, rate your tutor, and track progress.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section style="background: var(--primary-color); color: white; padding: 4rem 0; text-align: center;">
-        <div class="container">
-            <h2 style="font-size: 2.5rem; font-weight: 600; margin-bottom: 1rem;">Ready to Start Learning?</h2>
-            <p style="font-size: 1.125rem; margin-bottom: 2rem; opacity: 0.9;">Join thousands of students and tutors in our learning community</p>
-            <a href="/register" class="btn" style="background: white; color: var(--primary-color); font-size: 1rem; padding: 1rem 2rem;">Join Now - It's Free!</a>
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container" style="position: relative; z-index: 1;">
+            <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.02em;">Ready to level up your learning?</h2>
+            <p style="font-size: 1.1rem; opacity: 0.85; margin-bottom: 2.5rem;">Join thousands of students and tutors in our community. It's completely free.</p>
+            <a href="/register" class="btn btn-hero-primary" style="font-size: 1rem;">Join Now — It's Free 🎓</a>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer style="background: var(--gray-800); color: white; padding: 2rem 0; text-align: center;">
+    <footer>
         <div class="container">
-            <p>&copy; 2024 PeerTutorMatchmaker. All rights reserved.</p>
+            <p>&copy; 2024 PeerTutorMatchmaker. Built for learners, by learners.</p>
         </div>
     </footer>
 
     <script src="/js/app.js"></script>
+    <script src="/js/home-demo.js"></script>
 </body>
 </html>

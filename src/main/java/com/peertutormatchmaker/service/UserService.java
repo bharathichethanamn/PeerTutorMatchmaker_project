@@ -76,4 +76,8 @@ public class UserService {
     public boolean checkPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
 }
